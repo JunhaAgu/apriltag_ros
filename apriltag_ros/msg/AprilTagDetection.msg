@@ -11,4 +11,8 @@ float64[] size
 # tag, the homography is from the four tag corners. If a tag bundle, the
 # homography is from at least the four corners of one member tag and at most the
 # four corners of all member tags.
+
+
 geometry_msgs/PoseWithCovarianceStamped pose
+
+#geometry_msgs/Pose pose

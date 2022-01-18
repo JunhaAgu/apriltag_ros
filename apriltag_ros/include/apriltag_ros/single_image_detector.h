@@ -47,6 +47,8 @@
 #include "apriltag_ros/common_functions.h"
 #include <apriltag_ros/AnalyzeSingleImage.h>
 
+#include "hce_msgs/CallDumpDetector.h"
+
 namespace apriltag_ros
 {
 
@@ -62,8 +64,10 @@ class SingleImageDetector
   SingleImageDetector(ros::NodeHandle& nh, ros::NodeHandle& pnh);
 
   // The function which provides the single image analysis service
-  bool analyzeImage(apriltag_ros::AnalyzeSingleImage::Request& request,
-                     apriltag_ros::AnalyzeSingleImage::Response& response);
+//   bool analyzeImage(apriltag_ros::AnalyzeSingleImage::Request& request,
+//                      apriltag_ros::AnalyzeSingleImage::Response& response);
+bool analyzeImage(hce_msgs::CallDumpDetector::Request& request,
+                    hce_msgs::CallDumpDetector::Response& response);
 };
 
 } // namespace apriltag_ros

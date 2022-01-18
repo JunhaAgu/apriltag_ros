@@ -33,6 +33,8 @@
 
 #include <pluginlib/class_list_macros.h>
 
+#include <hce_msgs/CallDumpDetector.h>
+
 PLUGINLIB_EXPORT_CLASS(apriltag_ros::ContinuousDetector, nodelet::Nodelet);
 
 namespace apriltag_ros
@@ -91,8 +93,10 @@ void ContinuousDetector::imageCallback (
   }
 
   // Publish detected tags in the image by AprilTag 2
+  // tag_detections_publisher_.publish(
+  //     tag_detector_->detectTags(cv_image_,camera_info));
   tag_detections_publisher_.publish(
-      tag_detector_->detectTags(cv_image_,camera_info));
+      tag_detector_->detectTags(cv_image_));
 
   // Publish the camera image overlaid by outlines of the detected tags and
   // their payload values

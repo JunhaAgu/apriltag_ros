@@ -34,6 +34,11 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <std_msgs/Header.h>
 
+#include "hce_msgs/CallDumpDetector.h"
+#include <cv_bridge/cv_bridge.h>
+
+
+
 namespace apriltag_ros
 {
 
@@ -43,50 +48,79 @@ SingleImageDetector::SingleImageDetector (ros::NodeHandle& nh,
 {
   // Advertise the single image analysis service
   single_image_analysis_service_ =
-      nh.advertiseService("single_image_tag_detection",
+      nh.advertiseService("tag_centers",
                           &SingleImageDetector::analyzeImage, this);
   tag_detections_publisher_ =
       nh.advertise<AprilTagDetectionArray>("tag_detections", 1);
+      // nh.advertise<AprilTagDetectionArray>("tag_detections", 1);
   ROS_INFO_STREAM("Ready to do tag detection on single images");
 }
 
 bool SingleImageDetector::analyzeImage(
-    apriltag_ros::AnalyzeSingleImage::Request& request,
-    apriltag_ros::AnalyzeSingleImage::Response& response)
+    hce_msgs::CallDumpDetector::Request& request,
+    hce_msgs::CallDumpDetector::Response& response)
+    // apriltag_ros::AnalyzeSingleImage::Request& request,
+    // apriltag_ros::AnalyzeSingleImage::Response& response)
 {
 
   ROS_INFO("[ Summoned to analyze image ]");
-  ROS_INFO("Image load path: %s",
-           request.full_path_where_to_get_image.c_str());
-  ROS_INFO("Image save path: %s",
-           request.full_path_where_to_save_image.c_str());
+  // ROS_INFO("Image load path: %s",
+  //          request.full_path_where_to_get_image.c_str());
+  // ROS_INFO("Image save path: %s",
+  //          request.full_path_where_to_save_image.c_str());
 
   // Read the image
-  cv::Mat image = cv::imread(request.full_path_where_to_get_image,
-                             cv::IMREAD_COLOR);
+
+  cv_bridge::CvImagePtr cv_ptr;
+  cv_ptr = cv_bridge::toCvCopy(request.img0, sensor_msgs::image_encodings::BGR8);
+  cv::Mat image = cv_ptr->image;
+
+  // cv::Mat image = cv::imread(request.full_path_where_to_get_image,
+  //                            cv::IMREAD_COLOR);
   if (image.data == NULL)
   {
     // Cannot read image
-    ROS_ERROR_STREAM("Could not read image " <<
-                     request.full_path_where_to_get_image.c_str());
+    
+    // ROS_ERROR_STREAM("Could not read image " <<
+    //                  request.full_path_where_to_get_image.c_str());
     return false;
   }
-
+  
   // Detect tags in the image
   cv_bridge::CvImagePtr loaded_image(new cv_bridge::CvImage(std_msgs::Header(),
                                                             "bgr8", image));
   loaded_image->header.frame_id = "camera";
-  response.tag_detections =
-      tag_detector_.detectTags(loaded_image,sensor_msgs::CameraInfoConstPtr(
-          new sensor_msgs::CameraInfo(request.camera_info)));
+  AprilTagDetectionArray tag_centers_tmp =
+      tag_detector_.detectTags(loaded_image);
+      // tag_detector_.detectTags(loaded_image,sensor_msgs::CameraInfoConstPtr(
+      //     new sensor_msgs::CameraInfo(request.camera_info)));
+ 
+  std::cout << ">>>>>>>>> How many Apriltags were found? " << tag_centers_tmp.detections.size() << std::endl;
+  
+  
+
+  response.header = tag_centers_tmp.header;
+  // response.header.stamp = ros::Time::now(); // time
+  // response.header.stamp.sec = ros::Time::now().toSec();
+  // response.header.stamp.nsec = ros::Time::now().toNSec();
+  response.tag_centers = tag_centers_tmp.detections;
+  if (tag_centers_tmp.detections.size() != 0)
+  {response.success = 1;}
 
   // Publish detected tags (AprilTagDetectionArray, basically an array of
   // geometry_msgs/PoseWithCovarianceStamped)
-  tag_detections_publisher_.publish(response.tag_detections);
+
+  // tag_detections_publisher_.publish(response.detections);
+
+  tag_centers_tmp.header.stamp = ros::Time::now(); // time
+  tag_centers_tmp.header.stamp.sec = ros::Time::now().toSec();
+  tag_centers_tmp.header.stamp.nsec = ros::Time::now().toNSec();
+    
+  tag_detections_publisher_.publish(tag_centers_tmp);
 
   // Save tag detections image
   tag_detector_.drawDetections(loaded_image);
-  cv::imwrite(request.full_path_where_to_save_image, loaded_image->image);
+  cv::imwrite("/home/junhakim/service_test_results/result.png", loaded_image->image);
 
   ROS_INFO("Done!\n");
 

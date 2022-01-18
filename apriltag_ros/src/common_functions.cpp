@@ -42,6 +42,11 @@
 #include "tagCircle21h7.h"
 #include "tagCircle49h12.h"
 
+#include "apriltag_ros/hce_apriltag.h"
+#include "hce_msgs/CallDumpDetector.h"
+
+using namespace INTRINSIC;
+
 namespace apriltag_ros
 {
 
@@ -200,9 +205,11 @@ TagDetector::~TagDetector() {
   }
 }
 
-AprilTagDetectionArray TagDetector::detectTags (
-    const cv_bridge::CvImagePtr& image,
-    const sensor_msgs::CameraInfoConstPtr& camera_info) {
+// AprilTagDetectionArray TagDetector::detectTags (
+//     const cv_bridge::CvImagePtr& image,
+//     const sensor_msgs::CameraInfoConstPtr& camera_info) {
+  AprilTagDetectionArray TagDetector::detectTags (
+    const cv_bridge::CvImagePtr& image) {
   // Convert image to AprilTag code's format
   cv::Mat gray_image;
   if (image->image.channels() == 1)
@@ -219,14 +226,14 @@ AprilTagDetectionArray TagDetector::detectTags (
                                   .buf = gray_image.data
   };
 
-  image_geometry::PinholeCameraModel camera_model;
-  camera_model.fromCameraInfo(camera_info);
+  // image_geometry::PinholeCameraModel camera_model;
+  // camera_model.fromCameraInfo(camera_info);
 
   // Get camera intrinsic properties for rectified image.
-  double fx = camera_model.fx(); // focal length in camera x-direction [px]
-  double fy = camera_model.fy(); // focal length in camera y-direction [px]
-  double cx = camera_model.cx(); // optical center x-coordinate [px]
-  double cy = camera_model.cy(); // optical center y-coordinate [px]
+  double fx = Intrinsic_fx; //camera_model.fx(); // focal length in camera x-direction [px]
+  double fy = Intrinsic_fy; //camera_model.fy(); // focal length in camera y-direction [px]
+  double cx = Intrinsic_cx; //camera_model.cx(); // optical center x-coordinate [px]
+  double cy = Intrinsic_cy; //camera_model.cy(); // optical center y-coordinate [px]
 
   // Run AprilTag 2 algorithm on the image
   if (detections_)
