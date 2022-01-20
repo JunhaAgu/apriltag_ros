@@ -66,6 +66,7 @@ generate_messages(
   geometry_msgs
   sensor_msgs
   std_msgs
+  apriltag_ros
 )
 
 catkin_package(

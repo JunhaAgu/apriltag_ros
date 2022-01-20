@@ -34,8 +34,9 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <std_msgs/Header.h>
 
-#include "hce_msgs/CallDumpDetector.h"
 #include <cv_bridge/cv_bridge.h>
+
+#include <hce_msgs/HceSingleImage.h>
 
 
 
@@ -48,7 +49,7 @@ SingleImageDetector::SingleImageDetector (ros::NodeHandle& nh,
 {
   // Advertise the single image analysis service
   single_image_analysis_service_ =
-      nh.advertiseService("tag_centers",
+      nh.advertiseService("single_image_tag_detection",
                           &SingleImageDetector::analyzeImage, this);
   tag_detections_publisher_ =
       nh.advertise<AprilTagDetectionArray>("tag_detections", 1);
@@ -57,8 +58,8 @@ SingleImageDetector::SingleImageDetector (ros::NodeHandle& nh,
 }
 
 bool SingleImageDetector::analyzeImage(
-    hce_msgs::CallDumpDetector::Request& request,
-    hce_msgs::CallDumpDetector::Response& response)
+    hce_msgs::HceSingleImage::Request& request,
+    hce_msgs::HceSingleImage::Response& response)
     // apriltag_ros::AnalyzeSingleImage::Request& request,
     // apriltag_ros::AnalyzeSingleImage::Response& response)
 {
@@ -97,15 +98,33 @@ bool SingleImageDetector::analyzeImage(
  
   std::cout << ">>>>>>>>> How many Apriltags were found? " << tag_centers_tmp.detections.size() << std::endl;
   
-  
+  // for (int i = 0; i < tag_centers_tmp.detections.size(); ++i)
+  // {
+    response.tag_detections.detections = tag_centers_tmp.detections;
+  // }
 
-  response.header = tag_centers_tmp.header;
+  // for (int i = 0; i < tag_centers_tmp.detections.size(); ++i)
+  // {
+    // response.tag_detections.detections[i].id = tag_centers_tmp.detections[i].id;
+    // response.tag_detections.detections[i].pose = tag_centers_tmp.detections[i].pose.pose.pose;
+    // response.tag_detections.detections[i].size = tag_centers_tmp.detections[i].size;
+    // response.tag_detections.detections = tag_centers_tmp.detections;
+  // }
+  
   // response.header.stamp = ros::Time::now(); // time
   // response.header.stamp.sec = ros::Time::now().toSec();
   // response.header.stamp.nsec = ros::Time::now().toNSec();
-  response.tag_centers = tag_centers_tmp.detections;
+  // response.tag_centers = tag_centers_tmp.detections;
+
+  for (int i = 0; i < tag_centers_tmp.detections.size(); ++i)
+    {
+      std::cout<<"============ "<<"id = "<< i <<" ============"<<std::endl;
+      // printf("id = %d, {x, y, z} = {%.4f, %.4f, %.4f}\n", srv.response.tag_centers[i].id.at(0), srv.response.tag_centers[i].pose.pose.pose.position.x, srv.response.tag_centers[i].pose.pose.pose.position.y, srv.response.tag_centers[i].pose.pose.pose.position.z);
+      // printf("{qx, qy, qz, qw} = {%.4f, %.4f, %.4f, %.8f}\n", srv.response.tag_centers[i].pose.pose.pose.orientation.x, srv.response.tag_centers[i].pose.pose.pose.orientation.y, srv.response.tag_centers[i].pose.pose.pose.orientation.z, srv.response.tag_centers[i].pose.pose.pose.orientation.w);
+    }
+
   if (tag_centers_tmp.detections.size() != 0)
-  {response.success = 1;}
+
 
   // Publish detected tags (AprilTagDetectionArray, basically an array of
   // geometry_msgs/PoseWithCovarianceStamped)
