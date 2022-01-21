@@ -38,8 +38,6 @@
 
 #include <hce_msgs/HceSingleImage.h>
 
-
-
 namespace apriltag_ros
 {
 
@@ -54,7 +52,9 @@ SingleImageDetector::SingleImageDetector (ros::NodeHandle& nh,
   tag_detections_publisher_ =
       nh.advertise<AprilTagDetectionArray>("tag_detections", 1);
       // nh.advertise<AprilTagDetectionArray>("tag_detections", 1);
-  ROS_INFO_STREAM("Ready to do tag detection on single images");
+  // ROS_INFO_STREAM("Ready to do tag detection on single images");
+    ROS_INFO_STREAM("\n <Apriltag_ros server> Ready to do tag detection");
+
 }
 
 bool SingleImageDetector::analyzeImage(
@@ -63,15 +63,14 @@ bool SingleImageDetector::analyzeImage(
     // apriltag_ros::AnalyzeSingleImage::Request& request,
     // apriltag_ros::AnalyzeSingleImage::Response& response)
 {
-
-  ROS_INFO("[ Summoned to analyze image ]");
+  ROS_INFO("\n <Apriltag_ros server> callback");
+  // ROS_INFO("[ Summoned to analyze image ]");
   // ROS_INFO("Image load path: %s",
   //          request.full_path_where_to_get_image.c_str());
   // ROS_INFO("Image save path: %s",
   //          request.full_path_where_to_save_image.c_str());
 
   // Read the image
-
   cv_bridge::CvImagePtr cv_ptr;
   cv_ptr = cv_bridge::toCvCopy(request.img0, sensor_msgs::image_encodings::BGR8);
   cv::Mat image = cv_ptr->image;
@@ -81,9 +80,9 @@ bool SingleImageDetector::analyzeImage(
   if (image.data == NULL)
   {
     // Cannot read image
-    
     // ROS_ERROR_STREAM("Could not read image " <<
     //                  request.full_path_where_to_get_image.c_str());
+    ROS_ERROR_STREAM("No image in request of hce_msgs::HceSingleImage"); 
     return false;
   }
   
@@ -96,31 +95,18 @@ bool SingleImageDetector::analyzeImage(
       // tag_detector_.detectTags(loaded_image,sensor_msgs::CameraInfoConstPtr(
       //     new sensor_msgs::CameraInfo(request.camera_info)));
  
-  std::cout << ">>>>>>>>> How many Apriltags were found? " << tag_centers_tmp.detections.size() << std::endl;
+  std::cout << " <Apriltag_ros server> How many Apriltags were found? " << tag_centers_tmp.detections.size() << std::endl;
   
-  // for (int i = 0; i < tag_centers_tmp.detections.size(); ++i)
-  // {
-    response.tag_detections.detections = tag_centers_tmp.detections;
-  // }
-
-  // for (int i = 0; i < tag_centers_tmp.detections.size(); ++i)
-  // {
-    // response.tag_detections.detections[i].id = tag_centers_tmp.detections[i].id;
-    // response.tag_detections.detections[i].pose = tag_centers_tmp.detections[i].pose.pose.pose;
-    // response.tag_detections.detections[i].size = tag_centers_tmp.detections[i].size;
-    // response.tag_detections.detections = tag_centers_tmp.detections;
-  // }
+  // success: over than 1 tag detected
+  if (tag_centers_tmp.detections.size() > 0)
+  {
+    response.success = 1;
+  }
+  response.tag_detections.detections = tag_centers_tmp.detections;
   
-  // response.header.stamp = ros::Time::now(); // time
-  // response.header.stamp.sec = ros::Time::now().toSec();
-  // response.header.stamp.nsec = ros::Time::now().toNSec();
-  // response.tag_centers = tag_centers_tmp.detections;
-
   for (int i = 0; i < tag_centers_tmp.detections.size(); ++i)
     {
-      std::cout<<"============ "<<"id = "<< i <<" ============"<<std::endl;
-      // printf("id = %d, {x, y, z} = {%.4f, %.4f, %.4f}\n", srv.response.tag_centers[i].id.at(0), srv.response.tag_centers[i].pose.pose.pose.position.x, srv.response.tag_centers[i].pose.pose.pose.position.y, srv.response.tag_centers[i].pose.pose.pose.position.z);
-      // printf("{qx, qy, qz, qw} = {%.4f, %.4f, %.4f, %.8f}\n", srv.response.tag_centers[i].pose.pose.pose.orientation.x, srv.response.tag_centers[i].pose.pose.pose.orientation.y, srv.response.tag_centers[i].pose.pose.pose.orientation.z, srv.response.tag_centers[i].pose.pose.pose.orientation.w);
+      std::cout<<" <Apriltag_ros server> ========== "<<"id = "<< response.tag_detections.detections.at(i).id.at(0) <<" =========="<<std::endl;
     }
 
   if (tag_centers_tmp.detections.size() != 0)
@@ -130,18 +116,17 @@ bool SingleImageDetector::analyzeImage(
   // geometry_msgs/PoseWithCovarianceStamped)
 
   // tag_detections_publisher_.publish(response.detections);
-
-  tag_centers_tmp.header.stamp = ros::Time::now(); // time
-  tag_centers_tmp.header.stamp.sec = ros::Time::now().toSec();
-  tag_centers_tmp.header.stamp.nsec = ros::Time::now().toNSec();
+  // tag_centers_tmp.header.stamp = ros::Time::now(); // time
+  // tag_centers_tmp.header.stamp.sec = ros::Time::now().toSec();
+  // tag_centers_tmp.header.stamp.nsec = ros::Time::now().toNSec();
     
-  tag_detections_publisher_.publish(tag_centers_tmp);
+  tag_detections_publisher_.publish(response.tag_detections);
 
   // Save tag detections image
   tag_detector_.drawDetections(loaded_image);
   cv::imwrite("/home/junhakim/service_test_results/result.png", loaded_image->image);
 
-  ROS_INFO("Done!\n");
+  ROS_INFO("\n <Apriltag_ros server> Done!\n");
 
   return true;
 }
