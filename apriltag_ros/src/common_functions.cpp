@@ -499,7 +499,9 @@ Eigen::Matrix4d TagDetector::getRelativeTransform(
   cv::Matx33d cameraMatrix(fx,  0, cx,
                            0,  fy, cy,
                            0,   0,  1);
-  cv::Vec4f distCoeffs(0,0,0,0); // distortion coefficients
+  // cv::Vec4f distCoeffs(0,0,0,0); // distortion coefficients
+  cv::Vec4f distCoeffs(Intrinsic_distCoeffs_k1, Intrinsic_distCoeffs_k2, Intrinsic_distCoeffs_p1, Intrinsic_distCoeffs_p2); // distortion coefficients
+
   // TODO Perhaps something like SOLVEPNP_EPNP would be faster? Would
   // need to first check WHAT is a bottleneck in this code, and only
   // do this if PnP solution is the bottleneck.
