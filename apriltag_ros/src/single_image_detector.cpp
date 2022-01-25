@@ -36,7 +36,7 @@
 
 #include <cv_bridge/cv_bridge.h>
 
-#include <hce_msgs/HceSingleImage.h>
+#include <apriltag_ros/HceSingleImage.h>
 
 namespace apriltag_ros
 {
@@ -58,8 +58,8 @@ SingleImageDetector::SingleImageDetector (ros::NodeHandle& nh,
 }
 
 bool SingleImageDetector::analyzeImage(
-    hce_msgs::HceSingleImage::Request& request,
-    hce_msgs::HceSingleImage::Response& response)
+    apriltag_ros::HceSingleImage::Request& request,
+    apriltag_ros::HceSingleImage::Response& response)
     // apriltag_ros::AnalyzeSingleImage::Request& request,
     // apriltag_ros::AnalyzeSingleImage::Response& response)
 {
@@ -82,7 +82,7 @@ bool SingleImageDetector::analyzeImage(
     // Cannot read image
     // ROS_ERROR_STREAM("Could not read image " <<
     //                  request.full_path_where_to_get_image.c_str());
-    ROS_ERROR_STREAM("No image in request of hce_msgs::HceSingleImage"); 
+    ROS_ERROR_STREAM("No image in request of apriltag_ros::HceSingleImage"); 
     return false;
   }
   

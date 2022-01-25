@@ -59,6 +59,7 @@ add_message_files(
 add_service_files(
   FILES
   AnalyzeSingleImage.srv
+  HceSingleImage.srv
 )
 
 generate_messages(

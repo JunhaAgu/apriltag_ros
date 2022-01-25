@@ -17,12 +17,17 @@
     -->
 
     <!-- Camera intrinsic parameters -->
-    <!--
-    <param name="fx" type="double" value="893.4800446716952" />
+    
+    
+    <!-- <param name="fx" type="double" value="893.4800446716952" /> 
     <param name="fy" type="double" value="893.2138912525431" />
     <param name="cx" type="double" value="529.8848649123668" />
     <param name="cy" type="double" value="395.1783894490890" />
-    -->
+
+    <param name="k1" type="double" value="0.155682618969427" />
+    <param name="k2" type="double" value="0.118825328777770" />
+    <param name="p1" type="double" value="5.831317355223568e-05" />
+    <param name="p2" type="double" value="0.001254306950798" /> -->
 
   </node>
 

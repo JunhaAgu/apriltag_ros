@@ -1,0 +1,5 @@
+sensor_msgs/Image img0
+#sensor_msgs/CameraInfo camera_info
+---
+bool success
+apriltag_ros/AprilTagDetectionArray tag_detections
