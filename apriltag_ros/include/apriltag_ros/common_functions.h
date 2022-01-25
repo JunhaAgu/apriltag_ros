@@ -67,6 +67,8 @@
 #include "apriltag_ros/AprilTagDetection.h"
 #include "apriltag_ros/AprilTagDetectionArray.h"
 
+#include "apriltag_ros/HceSingleImage.h"
+
 namespace apriltag_ros
 {
 
@@ -238,6 +240,17 @@ class TagDetector
   void drawDetections(cv_bridge::CvImagePtr image);
 
   bool get_publish_tf() const { return publish_tf_; }
+
+  public:
+  double c_fx;
+  double c_fy;
+  double c_cx;
+  double c_cy;
+
+  double c_dist_k1;
+  double c_dist_k2;
+  double c_dist_p1;
+  double c_dist_p2;
 };
 
 } // namespace apriltag_ros

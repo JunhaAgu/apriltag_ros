@@ -10,10 +10,6 @@
 #include <apriltag_ros/AnalyzeSingleImage.h>
 #include "apriltag_ros/single_image_detector.h"
 
-#include "apriltag_ros/hce_apriltag.h"
-
-using namespace INTRINSIC;
-
 // bool getRosParameter (ros::NodeHandle& pnh, std::string name, double& param)
 // {
 //   // Write parameter "name" from ROS Parameter Server into param

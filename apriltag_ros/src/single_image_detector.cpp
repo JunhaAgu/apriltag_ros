@@ -36,8 +36,6 @@
 
 #include <cv_bridge/cv_bridge.h>
 
-#include <apriltag_ros/HceSingleImage.h>
-
 namespace apriltag_ros
 {
 
@@ -85,7 +83,17 @@ bool SingleImageDetector::analyzeImage(
     ROS_ERROR_STREAM("No image in request of apriltag_ros::HceSingleImage"); 
     return false;
   }
-  
+
+  tag_detector_.c_fx = request.fx;
+  tag_detector_.c_fy = request.fy;
+  tag_detector_.c_cx = request.cx;
+  tag_detector_.c_cy = request.cy;
+
+  tag_detector_.c_dist_k1 = request.dist_k1;
+  tag_detector_.c_dist_k2 = request.dist_k2;
+  tag_detector_.c_dist_p1 = request.dist_p1;
+  tag_detector_.c_dist_p2 = request.dist_p2;
+    
   // Detect tags in the image
   cv_bridge::CvImagePtr loaded_image(new cv_bridge::CvImage(std_msgs::Header(),
                                                             "bgr8", image));

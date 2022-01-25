@@ -69,6 +69,7 @@ class SingleImageDetector
 //                      apriltag_ros::AnalyzeSingleImage::Response& response);
 bool analyzeImage(apriltag_ros::HceSingleImage::Request& request,
                     apriltag_ros::HceSingleImage::Response& response);
+
 };
 
 } // namespace apriltag_ros

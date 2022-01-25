@@ -1,5 +1,14 @@
 sensor_msgs/Image img0
-#sensor_msgs/CameraInfo camera_info
+
+float32 fx
+float32 fy
+float32 cx
+float32 cy
+
+float32 dist_k1
+float32 dist_k2
+float32 dist_p1
+float32 dist_p2
 ---
 bool success
 apriltag_ros/AprilTagDetectionArray tag_detections

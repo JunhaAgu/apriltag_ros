@@ -42,10 +42,7 @@
 #include "tagCircle21h7.h"
 #include "tagCircle49h12.h"
 
-#include "apriltag_ros/hce_apriltag.h"
 #include "hce_msgs/CallDumpDetector.h"
-
-using namespace INTRINSIC;
 
 namespace apriltag_ros
 {
@@ -230,10 +227,10 @@ TagDetector::~TagDetector() {
   // camera_model.fromCameraInfo(camera_info);
 
   // Get camera intrinsic properties for rectified image.
-  double fx = Intrinsic_fx; //camera_model.fx(); // focal length in camera x-direction [px]
-  double fy = Intrinsic_fy; //camera_model.fy(); // focal length in camera y-direction [px]
-  double cx = Intrinsic_cx; //camera_model.cx(); // optical center x-coordinate [px]
-  double cy = Intrinsic_cy; //camera_model.cy(); // optical center y-coordinate [px]
+  double fx = c_fx; //camera_model.fx(); // focal length in camera x-direction [px]
+  double fy = c_fy; //camera_model.fy(); // focal length in camera y-direction [px]
+  double cx = c_cx; //camera_model.cx(); // optical center x-coordinate [px]
+  double cy = c_cy; //camera_model.cy(); // optical center y-coordinate [px]
 
   // Run AprilTag 2 algorithm on the image
   if (detections_)
@@ -500,7 +497,7 @@ Eigen::Matrix4d TagDetector::getRelativeTransform(
                            0,  fy, cy,
                            0,   0,  1);
   // cv::Vec4f distCoeffs(0,0,0,0); // distortion coefficients
-  cv::Vec4f distCoeffs(Intrinsic_distCoeffs_k1, Intrinsic_distCoeffs_k2, Intrinsic_distCoeffs_p1, Intrinsic_distCoeffs_p2); // distortion coefficients
+  cv::Vec4f distCoeffs(c_dist_k1, c_dist_k2, c_dist_p1, c_dist_p2); // distortion coefficients
 
   // TODO Perhaps something like SOLVEPNP_EPNP would be faster? Would
   // need to first check WHAT is a bottleneck in this code, and only
