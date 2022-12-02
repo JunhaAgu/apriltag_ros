@@ -134,6 +134,10 @@ bool SingleImageDetector::analyzeImage(
   tag_detector_.drawDetections(loaded_image);
   cv::imwrite("/home/junhakim/service_test_results/result.png", loaded_image->image);
 
+  cv::namedWindow("detected tags");
+  cv::imshow("detected tags", loaded_image->image);
+  cv::waitKey(0);
+  
   ROS_INFO("\n <Apriltag_ros server> Done!\n");
 
   return true;
