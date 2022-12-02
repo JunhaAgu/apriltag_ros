@@ -29,6 +29,7 @@
 
 int main(int argc, char **argv)
 {
+  // Agu
   ros::init(argc, argv, "apriltag_ros_hce");
 
   ros::NodeHandle nh;
