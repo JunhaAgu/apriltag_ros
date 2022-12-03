@@ -67,8 +67,8 @@ class SingleImageDetector
   // The function which provides the single image analysis service
 //   bool analyzeImage(apriltag_ros::AnalyzeSingleImage::Request& request,
 //                      apriltag_ros::AnalyzeSingleImage::Response& response);
-bool analyzeImage(apriltag_ros::HceSingleImage::Request& request,
-                    apriltag_ros::HceSingleImage::Response& response);
+bool analyzeImage(hce_msgs::CallDumpDetector::Request& request,
+                    hce_msgs::CallDumpDetector::Response& response);
 
 };
 

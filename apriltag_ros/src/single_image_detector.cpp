@@ -45,7 +45,7 @@ SingleImageDetector::SingleImageDetector (ros::NodeHandle& nh,
 {
   // Advertise the single image analysis service
   single_image_analysis_service_ =
-      nh.advertiseService("single_image_tag_detection",
+      nh.advertiseService("/service_dump_detector",
                           &SingleImageDetector::analyzeImage, this);
   tag_detections_publisher_ =
       nh.advertise<AprilTagDetectionArray>("tag_detections", 1);
@@ -56,8 +56,8 @@ SingleImageDetector::SingleImageDetector (ros::NodeHandle& nh,
 }
 
 bool SingleImageDetector::analyzeImage(
-    apriltag_ros::HceSingleImage::Request& request,
-    apriltag_ros::HceSingleImage::Response& response)
+    hce_msgs::CallDumpDetector::Request& request,
+    hce_msgs::CallDumpDetector::Response& response)
     // apriltag_ros::AnalyzeSingleImage::Request& request,
     // apriltag_ros::AnalyzeSingleImage::Response& response)
 {
@@ -110,14 +110,25 @@ bool SingleImageDetector::analyzeImage(
   {
     response.success = 1;
   }
-  response.tag_detections.detections = tag_centers_tmp.detections;
   
-  for (int i = 0; i < tag_centers_tmp.detections.size(); ++i)
-    {
-      std::cout<<" <Apriltag_ros server> ========== "<<"id = "<< response.tag_detections.detections.at(i).id.at(0) <<" =========="<<std::endl;
-    }
+  // response.tag_detections.detections = tag_centers_tmp.detections;
 
-  if (tag_centers_tmp.detections.size() != 0)
+  for (int i = 0; i < tag_centers_tmp.detections.size(); ++i)
+  {
+    response.tag_centers.push_back(tag_centers_tmp.detections[i].pose.pose.pose.position);
+    response.tag_id.push_back(tag_centers_tmp.detections[i].id[0]);
+
+    std::cout << " <Apriltag_ros server> ========== "
+              << "id = " << tag_centers_tmp.detections[i].id[0] << " ==========" << std::endl;
+    std::cout << tag_centers_tmp.detections[i].pose.pose.pose.position << std::endl;
+    printf("id = %d, {x, y, z} = {%.8f, %.8f, %.8f}\n",
+     tag_centers_tmp.detections[i].id[0], 
+     tag_centers_tmp.detections[i].pose.pose.pose.position.x, 
+     tag_centers_tmp.detections[i].pose.pose.pose.position.y, 
+     tag_centers_tmp.detections[i].pose.pose.pose.position.z );
+  }
+
+  // if (tag_centers_tmp.detections.size() != 0)
 
 
   // Publish detected tags (AprilTagDetectionArray, basically an array of
@@ -128,7 +139,7 @@ bool SingleImageDetector::analyzeImage(
   // tag_centers_tmp.header.stamp.sec = ros::Time::now().toSec();
   // tag_centers_tmp.header.stamp.nsec = ros::Time::now().toNSec();
     
-  tag_detections_publisher_.publish(response.tag_detections);
+  // tag_detections_publisher_.publish(tag_centers_tmp.detections);
 
   // Save tag detections image
   tag_detector_.drawDetections(loaded_image);
@@ -137,7 +148,7 @@ bool SingleImageDetector::analyzeImage(
   cv::namedWindow("detected tags");
   cv::imshow("detected tags", loaded_image->image);
   cv::waitKey(0);
-  
+
   ROS_INFO("\n <Apriltag_ros server> Done!\n");
 
   return true;
