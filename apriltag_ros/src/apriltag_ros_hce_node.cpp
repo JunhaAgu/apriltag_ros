@@ -35,7 +35,12 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
   ros::NodeHandle pnh("~");
 
-  apriltag_ros::SingleImageDetector hce_tag_detector(nh, pnh);
+  std::string param_name;
+  std::string dir_txt;
+  param_name = "~dir_txt_";
+  ros::param::get(param_name, dir_txt);
+
+  apriltag_ros::SingleImageDetector hce_tag_detector(nh, pnh, dir_txt);
   
   ros::spin();
 }

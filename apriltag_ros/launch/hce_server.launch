@@ -5,12 +5,14 @@
   <arg name="image_load_path" /> <!-- Where to load image for analysis from -->
   <arg name="image_save_path" /> <!-- Where to save tag detections image -->
 
+  <arg name="dir_txt"        default="/home/junhakim/catkin_ws/src/apriltag_ros/apriltag_ros/txt/"/>
+
   <!-- Set parameters -->
   <rosparam command="load" file="$(find apriltag_ros)/config/settings.yaml" ns="$(arg node_namespace)" />
   <rosparam command="load" file="$(find apriltag_ros)/config/tags.yaml" ns="$(arg node_namespace)" />
 
   <node pkg="apriltag_ros" type="apriltag_ros_hce_node" name="$(arg node_namespace)" clear_params="true" output="screen" launch-prefix="$(arg launch_prefix)" >
-
+    <param name="dir_txt_" type="string" value="$(arg dir_txt)"/>
     <!--
     <param name="image_load_path" type="str" value="$(arg image_load_path)" />
     <param name="image_save_path" type="str" value="$(arg image_save_path)" />

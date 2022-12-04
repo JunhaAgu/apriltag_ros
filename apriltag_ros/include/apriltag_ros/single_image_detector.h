@@ -50,27 +50,55 @@
 
 #include "hce_msgs/CallDumpDetector.h"
 
+#include <fstream> // ifstream header
+
+typedef Eigen::Matrix4d   Pose; 
+typedef Eigen::Matrix3d   Rot;
+typedef Eigen::Vector3d   trans;
+typedef Eigen::Vector4d   quat;
+typedef Eigen::Vector3d   Euler;
+typedef Eigen::Vector3d   Point3D;
+
+#define SQ_SUM(x, y, z) (((x) * (x) + (y) * (y) + (z) * (z)))
+
 namespace apriltag_ros
 {
 
-class SingleImageDetector
-{
- private:
-  TagDetector tag_detector_;
-  ros::ServiceServer single_image_analysis_service_;
+  class SingleImageDetector
+  {
+  public:
+  std::vector<int> id_candi_;
+  std::vector<trans> tag_trans_;
+  std::vector<quat> tag_quat_;
 
-  ros::Publisher tag_detections_publisher_;
-  
- public:
-  SingleImageDetector(ros::NodeHandle& nh, ros::NodeHandle& pnh);
+  std::vector<Point3D> a0_vertices_;
+  std::vector<Point3D> a1_vertices_;
+  std::vector<Point3D> a2_vertices_;
+  std::vector<Point3D> a3_vertices_;
+  std::vector<Point3D> a4_vertices_;
+  std::vector<Point3D> a5_vertices_;
 
-  // The function which provides the single image analysis service
-//   bool analyzeImage(apriltag_ros::AnalyzeSingleImage::Request& request,
-//                      apriltag_ros::AnalyzeSingleImage::Response& response);
-bool analyzeImage(hce_msgs::CallDumpDetector::Request& request,
-                    hce_msgs::CallDumpDetector::Response& response);
+  std::vector<Point3D> vertices_out_;
 
-};
+  private:
+    TagDetector tag_detector_;
+    ros::ServiceServer single_image_analysis_service_;
+
+    ros::Publisher tag_detections_publisher_;
+
+  public:
+    SingleImageDetector(ros::NodeHandle &nh, ros::NodeHandle &pnh, std::string& dir_txt);
+
+    // The function which provides the single image analysis service
+    //   bool analyzeImage(apriltag_ros::AnalyzeSingleImage::Request& request,
+    //                      apriltag_ros::AnalyzeSingleImage::Response& response);
+    bool analyzeImage(hce_msgs::CallDumpDetector::Request &request,
+                      hce_msgs::CallDumpDetector::Response &response);
+
+    void calculateBBVertex(AprilTagDetectionArray &tag_centers);
+
+    void readVertices(std::string& dir_txt);
+  };
 
 } // namespace apriltag_ros
 

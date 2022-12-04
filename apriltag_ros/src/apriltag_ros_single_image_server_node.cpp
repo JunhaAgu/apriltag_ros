@@ -39,7 +39,7 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
   ros::NodeHandle pnh("~");
 
-  apriltag_ros::SingleImageDetector continuous_tag_detector(nh, pnh);
+  // apriltag_ros::SingleImageDetector continuous_tag_detector(nh, pnh);
   
   ros::spin();
 }
