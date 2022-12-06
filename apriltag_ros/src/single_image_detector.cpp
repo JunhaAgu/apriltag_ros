@@ -52,12 +52,23 @@ SingleImageDetector::SingleImageDetector (ros::NodeHandle& nh,
       nh.advertise<AprilTagDetectionArray>("tag_detections", 1);
       // nh.advertise<AprilTagDetectionArray>("tag_detections", 1);
   // ROS_INFO_STREAM("Ready to do tag detection on single images");
-    ROS_INFO_STREAM("\n <Apriltag_ros server> Ready to do tag detection");
+    
 
   id_candi_.reserve(6);
   tag_trans_.reserve(6);
+  bb_pcl_a0_.reserve(200000);
+  bb_pcl_a1_.reserve(200000);
+  bb_pcl_a2_.reserve(200000);
+  bb_pcl_a3_.reserve(200000);
+  bb_pcl_a4_.reserve(200000);
+  bb_pcl_a5_.reserve(200000);
+  bb_pcl_out_.reserve(200000);
 
   readVertices(dir_txt);
+
+  readTruckPCL(dir_txt);
+
+  ROS_INFO_STREAM("\n <Apriltag_ros server> Ready to do tag detection");
 }
 
 void SingleImageDetector::readVertices(std::string& dir_txt)
@@ -199,6 +210,127 @@ void SingleImageDetector::readVertices(std::string& dir_txt)
 	}
 }
 
+void SingleImageDetector::readTruckPCL(std::string& dir_txt)
+{
+  std::string bb_pcl_a0_dir = dir_txt + "bb_pcl_a0.txt";
+  std::string bb_pcl_a1_dir = dir_txt + "bb_pcl_a1.txt";
+  std::string bb_pcl_a2_dir = dir_txt + "bb_pcl_a2.txt";
+  std::string bb_pcl_a3_dir = dir_txt + "bb_pcl_a3.txt";
+  std::string bb_pcl_a4_dir = dir_txt + "bb_pcl_a4.txt";
+  std::string bb_pcl_a5_dir = dir_txt + "bb_pcl_a5.txt";
+
+  // pcl::PointCloud<pcl::PointXYZ> pcl;
+  pcl::PointXYZ point_tmp;
+
+  std::ifstream file0(bb_pcl_a0_dir);
+	if( file0.is_open() ){
+		std::string line;
+
+    int cnt = 0;
+    getline(file0, line);
+		while(getline(file0, line)){
+      std::stringstream ss;
+      ss << line;
+      ss >> point_tmp.x;
+      ss >> point_tmp.y;
+      ss >> point_tmp.z;
+      bb_pcl_a0_.push_back(point_tmp);
+      cnt += 1;
+		}
+		file0.close();
+	}
+
+  std::ifstream file1(bb_pcl_a1_dir);
+	if( file1.is_open() ){
+		std::string line;
+
+    int cnt = 0;
+    getline(file1, line);
+		while(getline(file1, line)){
+      std::stringstream ss;
+      ss << line;
+      ss >> point_tmp.x;
+      ss >> point_tmp.y;
+      ss >> point_tmp.z;
+      bb_pcl_a1_.push_back(point_tmp);
+      cnt += 1;
+		}
+		file1.close();
+	}
+
+  std::ifstream file2(bb_pcl_a2_dir);
+	if( file2.is_open() ){
+		std::string line;
+
+    int cnt = 0;
+    getline(file2, line);
+		while(getline(file2, line)){
+      std::stringstream ss;
+      ss << line;
+      ss >> point_tmp.x;
+      ss >> point_tmp.y;
+      ss >> point_tmp.z;
+      bb_pcl_a2_.push_back(point_tmp);
+      cnt += 1;
+		}
+		file2.close();
+	}
+
+  std::ifstream file3(bb_pcl_a3_dir);
+	if( file3.is_open() ){
+		std::string line;
+
+    int cnt = 0;
+    getline(file3, line);
+		while(getline(file3, line)){
+      std::stringstream ss;
+      ss << line;
+      ss >> point_tmp.x;
+      ss >> point_tmp.y;
+      ss >> point_tmp.z;
+      bb_pcl_a3_.push_back(point_tmp);
+      cnt += 1;
+		}
+		file3.close();
+	}
+
+  std::ifstream file4(bb_pcl_a4_dir);
+	if( file4.is_open() ){
+		std::string line;
+
+    int cnt = 0;
+    getline(file4, line);
+		while(getline(file4, line)){
+      std::stringstream ss;
+      ss << line;
+      ss >> point_tmp.x;
+      ss >> point_tmp.y;
+      ss >> point_tmp.z;
+      bb_pcl_a4_.push_back(point_tmp);
+      cnt += 1;
+		}
+		file4.close();
+	}
+
+  std::ifstream file5(bb_pcl_a5_dir);
+	if( file5.is_open() ){
+		std::string line;
+
+    int cnt = 0;
+    getline(file5, line);
+		while(getline(file5, line)){
+      std::stringstream ss;
+      ss << line;
+      ss >> point_tmp.x;
+      ss >> point_tmp.y;
+      ss >> point_tmp.z;
+      bb_pcl_a5_.push_back(point_tmp);
+      cnt += 1;
+		}
+		file5.close();
+	}
+}
+
 bool SingleImageDetector::analyzeImage(
     hce_msgs::CallDumpDetector::Request& request,
     hce_msgs::CallDumpDetector::Response& response)
@@ -298,7 +430,8 @@ bool SingleImageDetector::analyzeImage(
       point_out_tmp.z = vertices_out_[i][2];
       response.bb_vertices.push_back(point_out_tmp);
     }
-    
+
+    pcl::toROSMsg(bb_pcl_out_, response.bb_pcl);
   }
   // if (tag_centers_tmp.detections.size() != 0)
 
@@ -395,6 +528,8 @@ void SingleImageDetector::calculateBBVertex(AprilTagDetectionArray& tag_centers)
   T_c0aX(3,3) = 1;
   std::cout << T_c0aX <<std::endl;
 
+  pcl::PointCloud<pcl::PointXYZ>::Ptr ptr_transformed(new pcl::PointCloud<pcl::PointXYZ>);
+
   switch(dist_min_id)
   {
   case 0:
@@ -402,37 +537,46 @@ void SingleImageDetector::calculateBBVertex(AprilTagDetectionArray& tag_centers)
     {
       vertices_out_.push_back(T_c0aX.block(0, 0, 3, 3) * a0_vertices_[i] + T_c0aX.block(0, 3, 3, 1));
     }
+    pcl::transformPointCloud(bb_pcl_a0_, *ptr_transformed, T_c0aX);
 
   case 1:
     for (int i = 0; i < 8; ++i)
     {
       vertices_out_.push_back(T_c0aX.block(0, 0, 3, 3) * a1_vertices_[i] + T_c0aX.block(0, 3, 3, 1));
     }
+    pcl::transformPointCloud(bb_pcl_a1_, *ptr_transformed, T_c0aX);
 
   case 2:
     for (int i = 0; i < 8; ++i)
     {
       vertices_out_.push_back(T_c0aX.block(0, 0, 3, 3) * a2_vertices_[i] + T_c0aX.block(0, 3, 3, 1));
     }
+    pcl::transformPointCloud(bb_pcl_a2_, *ptr_transformed, T_c0aX);
 
   case 3:
     for (int i = 0; i < 8; ++i)
     {
       vertices_out_.push_back(T_c0aX.block(0, 0, 3, 3) * a3_vertices_[i] + T_c0aX.block(0, 3, 3, 1));
     }
+    pcl::transformPointCloud(bb_pcl_a3_, *ptr_transformed, T_c0aX);
 
   case 4:
     for (int i = 0; i < 8; ++i)
     {
       vertices_out_.push_back(T_c0aX.block(0, 0, 3, 3) * a4_vertices_[i] + T_c0aX.block(0, 3, 3, 1));
     }
+    pcl::transformPointCloud(bb_pcl_a4_, *ptr_transformed, T_c0aX);
 
   case 5:
     for (int i = 0; i < 8; ++i)
     {
       vertices_out_.push_back(T_c0aX.block(0, 0, 3, 3) * a5_vertices_[i] + T_c0aX.block(0, 3, 3, 1));
     }
+    pcl::transformPointCloud(bb_pcl_a5_, *ptr_transformed, T_c0aX);
   }
+
+  bb_pcl_out_ = *ptr_transformed;
+
 }
 
 } // namespace apriltag_ros

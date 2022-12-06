@@ -16,6 +16,8 @@ find_package(catkin REQUIRED COMPONENTS
   tf
 
   hce_msgs
+  pcl_ros
+  pcl_conversions
 )
 
 find_package(Eigen3 REQUIRED)

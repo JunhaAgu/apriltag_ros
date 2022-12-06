@@ -52,6 +52,12 @@
 
 #include <fstream> // ifstream header
 
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/point_types.h>
+#include <pcl/PCLPointCloud2.h>
+#include <pcl/conversions.h>
+#include <pcl/common/transforms.h>
+
 typedef Eigen::Matrix4d   Pose; 
 typedef Eigen::Matrix3d   Rot;
 typedef Eigen::Vector3d   trans;
@@ -80,6 +86,15 @@ namespace apriltag_ros
 
   std::vector<Point3D> vertices_out_;
 
+  pcl::PointCloud<pcl::PointXYZ> bb_pcl_a0_;
+  pcl::PointCloud<pcl::PointXYZ> bb_pcl_a1_;
+  pcl::PointCloud<pcl::PointXYZ> bb_pcl_a2_;
+  pcl::PointCloud<pcl::PointXYZ> bb_pcl_a3_;
+  pcl::PointCloud<pcl::PointXYZ> bb_pcl_a4_;
+  pcl::PointCloud<pcl::PointXYZ> bb_pcl_a5_;
+
+  pcl::PointCloud<pcl::PointXYZ> bb_pcl_out_;
+
   private:
     TagDetector tag_detector_;
     ros::ServiceServer single_image_analysis_service_;
@@ -98,6 +113,8 @@ namespace apriltag_ros
     void calculateBBVertex(AprilTagDetectionArray &tag_centers);
 
     void readVertices(std::string& dir_txt);
+
+    void readTruckPCL(std::string& dir_txt);
   };
 
 } // namespace apriltag_ros
